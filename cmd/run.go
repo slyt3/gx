@@ -29,7 +29,7 @@ func Run(scriptPath string, args []string) int {
 
 	modTime := fileInfo.ModTime()
 
-	// reading file
+	// reading file content
 	fileContent, err := os.ReadFile(path)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error reading file: %v\n", err)
@@ -51,7 +51,8 @@ func Run(scriptPath string, args []string) int {
 
 		fmt.Println("Cache hit! Using cached binary")
 
-		// runing the cache binary
+		// runing the cache binary, command returnsthe cmd struct
+  // to execute the named program with the given arguments
 		cmd := exec.Command(hashedPath, args...)
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
