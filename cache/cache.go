@@ -102,6 +102,11 @@ func Store(scriptPath string, compiledBinaryPath string, modTime time.Time, scri
 		return fmt.Errorf("failed to copy binary to cache: %w", err)
 	}
 
+	err = os.Chmod(binaryPath, 0755)
+	if err != nil {
+		return fmt.Errorf("failed to make binary executable: %w", err)
+	}
+
 	entry := CacheEntry{
 		ScriptPath: scriptPath,
 		ScriptHash: scriptHash,
