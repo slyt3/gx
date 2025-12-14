@@ -20,8 +20,8 @@ type CacheEntry struct {
 	// Original script location
 	ScriptPath string `json:"script_path"`
 
-	// Hash of script content
-	ScriptHash string `json:"script_hash"`
+	// Store file size
+	FileSize int64 `json:"file_size"`
 
 	// Unix timestamp of last modification
 	ModTime time.Time `json:"mod_time"`
@@ -71,7 +71,7 @@ func GenerateCacheKey(scriptPath string) string {
 }
 
 // Store saves a compiled binary and its metadata to cache
-func Store(scriptPath string, compiledBinaryPath string, modTime time.Time, scriptHash string) error {
+func Store(scriptPath string, compiledBinaryPath string, modTime time.Time, fileSize int64) error {
 
 	// cache directory
 	cacheDir, err := GetCacheDir()
@@ -109,7 +109,7 @@ func Store(scriptPath string, compiledBinaryPath string, modTime time.Time, scri
 
 	entry := CacheEntry{
 		ScriptPath: scriptPath,
-		ScriptHash: scriptHash,
+		FileSize:   fileSize,
 		ModTime:    modTime,
 		BinaryPath: binaryPath,
 	}
@@ -128,7 +128,7 @@ func Store(scriptPath string, compiledBinaryPath string, modTime time.Time, scri
 }
 
 // Check looks up a cached binary for the given script
-func Check(scriptPath string, scriptHash string, modTime time.Time) (string, bool, error) {
+func Check(scriptPath string, fileSize int64, modTime time.Time) (string, bool, error) {
 
 	cacheDir, err := GetCacheDir()
 	if err != nil {
@@ -155,7 +155,7 @@ func Check(scriptPath string, scriptHash string, modTime time.Time) (string, boo
 		return "", false, fmt.Errorf("failed to parse meta file: %w", err)
 	}
 
-	if entry.ScriptHash != scriptHash {
+	if entry.FileSize != fileSize {
 		return "", false, nil
 	}
 

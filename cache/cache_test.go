@@ -44,10 +44,10 @@ func TestStore(t *testing.T) {
 	tmpFile.Close()
 
 	scriptPath := "/home/user/test.go"
-	scriptHash := "abcd1234"
 	modTime := time.Now()
+	fileSize := int64(len("fake binary content"))
 
-	err = Store(scriptPath, tmpFile.Name(), modTime, scriptHash)
+	err = Store(scriptPath, tmpFile.Name(), modTime, fileSize)
 	if err != nil {
 		t.Fatalf("Store failed: %v", err)
 	}
@@ -83,17 +83,17 @@ func TestCheck(t *testing.T) {
 
 	//  test data
 	scriptPath := "/home/user/checktest.go"
-	scriptHash := "hash123"
+	fileSize := int64(12)
 	modTime := time.Now()
 
 	// Store binary in cache
-	err = Store(scriptPath, tmpFile.Name(), modTime, scriptHash)
+	err = Store(scriptPath, tmpFile.Name(), modTime, fileSize)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Should find cached binary
-	binPath, valid, err := Check(scriptPath, scriptHash, modTime)
+	binPath, valid, err := Check(scriptPath, fileSize, modTime)
 	if err != nil {
 		t.Fatalf("Check failed: %v", err)
 	}
@@ -106,7 +106,7 @@ func TestCheck(t *testing.T) {
 	t.Logf("✓ Test 1 passed: Found cached binary at %s", binPath)
 
 	// Should NOT find cached binary
-	_, valid, err = Check(scriptPath, "wronghash", modTime)
+	_, valid, err = Check(scriptPath, 999, modTime)
 	if err != nil {
 		t.Fatalf("Check failed: %v", err)
 	}
@@ -117,7 +117,7 @@ func TestCheck(t *testing.T) {
 
 	// Should NOT find cached binary
 	wrongTime := time.Now().Add(time.Hour)
-	_, valid, err = Check(scriptPath, scriptHash, wrongTime)
+	_, valid, err = Check(scriptPath, 999, wrongTime)
 	if err != nil {
 		t.Fatalf("Check failed: %v", err)
 	}
